@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     marginTop: 120,
   },
   heading: {
-    fontSize: 32,
+    fontSize: 35,
     fontWeight: '900',
     color: textColor.black,
     fontFamily: 'SF-Pro-Display-Bold',
