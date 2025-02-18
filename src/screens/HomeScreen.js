@@ -1,25 +1,30 @@
-import { ImageBackground, StyleSheet, Text, View, TextInput, Image } from 'react-native';
+import { ImageBackground, StyleSheet, Text, View, TextInput, Image, ScrollView } from 'react-native';
 import React from 'react';
 import { height, width } from '../assets/constants';
 import Pokeball_header from '../assets/Images/Pokeball-no-bg.png';
 import { customColor, textColor } from '../assets/colors';
+import Card from '../components/Card';
 
 const searchIcon = require('../assets/Icons/Search.png'); // Import the search icon
 
 const HomeScreen = () => {
   return (
-    <View>
+    <View style={styles.container}>
+      {/* Header Section */}
       <ImageBackground
         resizeMode="contain"
         style={styles.bgImage}
         source={Pokeball_header}
       >
-        <View style={styles.contents}>
+        
+      </ImageBackground>
+
+      <View style={styles.contents}>
           <Text style={styles.heading}>Pokédex</Text>
           <Text style={styles.subText}>
             Search for Pokémon by name or using the National Pokédex number.
           </Text>
-          
+
           {/* Search Bar with Icon */}
           <View style={styles.searchContainer}>
             <Image source={searchIcon} style={styles.searchIcon} />
@@ -29,8 +34,21 @@ const HomeScreen = () => {
               placeholderTextColor={textColor.grey}
             />
           </View>
-        </View>
-      </ImageBackground>
+        </View>s
+
+      {/* Scrollable Section (Cards) */}
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Card />
+        <Card />
+        <Card />
+        <Card />
+        <Card />
+        <Card />
+        <Card />
+        <Card />
+        <Card />
+        <Card />
+      </ScrollView>
     </View>
   );
 };
@@ -38,15 +56,23 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: textColor.white,
+  },
   bgImage: {
     width: '100%',
     height: height / 4,
     marginTop: 40,
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'absolute', // Fixes the header in place
+    top: 0,
+    left: 0,
+    right: 0,
   },
   contents: {
-    marginTop: 120,
+    marginTop: 100,
   },
   heading: {
     fontSize: 35,
@@ -61,23 +87,26 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   searchContainer: {
-    flexDirection: 'row', // Align icon and input in one line
+    flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: customColor.input,
     borderRadius: 10,
     marginTop: 20,
     height: 60,
-    width: '100%',
+    width: '90%',
     paddingHorizontal: 15,
   },
   searchIcon: {
-    width: 24, // Adjust size as needed
+    width: 24,
     height: 24,
-    marginRight: 10, // Space between icon and text input
+    marginRight: 10,
   },
   searchbar: {
-    flex: 1, // Makes the input take available space
+    flex: 1,
     fontSize: 16,
     color: textColor.black,
+  },
+  scrollContainer: {
+    
   },
 });
