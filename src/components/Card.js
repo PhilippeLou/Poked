@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Image } from 'react-native';
 import React from 'react';
 import { backgroundColors } from '../assets/colors';
 import Bulbasaur from '../assets/Images/bulb.png';
+import Tag from './Tag';
 
 const Card = () => {
   return (
@@ -9,8 +10,14 @@ const Card = () => {
       <View>
         <Text style={styles.pokeNumber}>#0001</Text>
         <Text style={styles.pokeName}>Bulbasaur</Text>
-        <Text style={styles.pokeName}>Bulbasaur</Text>
+        
+        <View style={styles.row}>
+          <Tag type="grass"/>
+          <Tag type="poison"/>
+        </View>
       </View>
+
+      
 
       {/* Image Overlapping the Card */}
       <Image source={Bulbasaur} style={styles.pokeImage} />
@@ -46,5 +53,11 @@ const styles = StyleSheet.create({
     position: 'absolute', // ✅ Make it float
     right: 0, // ✅ Move it outside the card
     top: -30, // ✅ Move it slightly up
+  },
+
+  row: {
+    display: 'flex',
+    flexDirection: 'row',
+    marginTop: 5,
   },
 });
