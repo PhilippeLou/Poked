@@ -1,34 +1,56 @@
-import { StyleSheet, Text, View, Image } from 'react-native';
-import React from 'react';
+import { StyleSheet, Text, View, Image, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { backgroundColors } from '../assets/colors';
 import Tag from './Tag';
-import PokeCard from '../assets/Images/pokecard.png'
+import PokeCard from '../assets/Images/pokecard.png';
 import Pattern from '../assets/Images/Pattern.png';
 
 const Card = ({ item }) => {
+  const [pokemon, setPokemon] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  console.warn({ item });
+  // Fetch Pokémon data from API
+  useEffect(() => {
+    const fetchPokemon = async () => {
+      try {
+        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${item}`);
+        const data = await response.json();
+        setPokemon(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching Pokémon:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchPokemon();
+  }, [item]);
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#fff" />;
+  }
 
   return (
-    <View style={{ ...styles.card, backgroundColor: backgroundColors['grass'] }}>
+    <View style={{ ...styles.card, backgroundColor: backgroundColors[pokemon.types[0].type.name] || 'gray' }}>
       <View>
-        <Text style={styles.pokeNumber}>#{String(item).padStart(4, '0')}</Text> {/* Formats number as #0001 */}
-        <Text style={styles.pokeName}>Bulbasaur</Text>
+        <Text style={styles.pokeNumber}>#{String(pokemon.id).padStart(4, '0')}</Text>
+        <Text style={styles.pokeName}>{pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</Text>
 
         <View style={styles.row}>
-          <Tag type="grass" />
-          <Tag type="poison" />
+          {pokemon.types.map((type, index) => (
+            <Tag key={index} type={type.type.name} />
+          ))}
         </View>
       </View>
 
-      {/* Image Overlapping the Card */}
+      {/* Pokémon Image */}
       <Image 
-        source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${item}.png` }} 
+        source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.id}.png` }} 
         style={styles.pokeImage} 
       />
 
-      <Image source={Pattern} style={styles.cardPattern}/>
-      <Image source={PokeCard} style={styles.pokecard}/>
+      <Image source={Pattern} style={styles.cardPattern} />
+      <Image source={PokeCard} style={styles.pokecard} />
     </View>
   );
 };
@@ -49,6 +71,7 @@ const styles = StyleSheet.create({
   pokeName: {
     fontSize: 26,
     color: 'white',
+    textTransform: 'capitalize',
   },
   pokeNumber: {
     fontSize: 12,
@@ -67,15 +90,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
   },
-
   cardPattern: {
     position: 'absolute',
     left: 130,
     top: 0,
     width: 100,
-    
   },
-
   row: {
     flexDirection: 'row',
     marginTop: 5,
