@@ -2,6 +2,8 @@ import { StyleSheet, Text, View, Image } from 'react-native';
 import React from 'react';
 import { backgroundColors } from '../assets/colors';
 import Tag from './Tag';
+import PokeCard from '../assets/Images/pokecard.png'
+import Pattern from '../assets/Images/Pattern.png';
 
 const Card = ({ item }) => {
 
@@ -24,6 +26,9 @@ const Card = ({ item }) => {
         source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${item}.png` }} 
         style={styles.pokeImage} 
       />
+
+      <Image source={Pattern} style={styles.cardPattern}/>
+      <Image source={PokeCard} style={styles.pokecard}/>
     </View>
   );
 };
@@ -56,7 +61,21 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     top: -30,
+    zIndex: 1000,
   },
+  pokecard: {
+    position: 'absolute',
+    right: 0,
+  },
+
+  cardPattern: {
+    position: 'absolute',
+    left: 130,
+    top: 0,
+    width: 100,
+    
+  },
+
   row: {
     flexDirection: 'row',
     marginTop: 5,
