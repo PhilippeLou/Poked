@@ -1,26 +1,29 @@
 import { StyleSheet, Text, View, Image } from 'react-native';
 import React from 'react';
 import { backgroundColors } from '../assets/colors';
-import Bulbasaur from '../assets/Images/bulb.png';
 import Tag from './Tag';
 
-const Card = () => {
+const Card = ({ item }) => {
+
+  console.warn({ item });
+
   return (
     <View style={{ ...styles.card, backgroundColor: backgroundColors['grass'] }}>
       <View>
-        <Text style={styles.pokeNumber}>#0001</Text>
+        <Text style={styles.pokeNumber}>#{String(item).padStart(4, '0')}</Text> {/* Formats number as #0001 */}
         <Text style={styles.pokeName}>Bulbasaur</Text>
-        
+
         <View style={styles.row}>
-          <Tag type="grass"/>
-          <Tag type="poison"/>
+          <Tag type="grass" />
+          <Tag type="poison" />
         </View>
       </View>
 
-      
-
       {/* Image Overlapping the Card */}
-      <Image source={Bulbasaur} style={styles.pokeImage} />
+      <Image 
+        source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${item}.png` }} 
+        style={styles.pokeImage} 
+      />
     </View>
   );
 };
@@ -36,7 +39,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    overflow: 'visible', // ✅ Ensures child elements can overflow
+    overflow: 'visible',
   },
   pokeName: {
     fontSize: 26,
@@ -47,16 +50,14 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   pokeImage: {
-    width: 150, // ✅ Make it bigger
+    width: 150,
     height: 150,
     resizeMode: 'contain',
-    position: 'absolute', // ✅ Make it float
-    right: 0, // ✅ Move it outside the card
-    top: -30, // ✅ Move it slightly up
+    position: 'absolute',
+    right: 0,
+    top: -30,
   },
-
   row: {
-    display: 'flex',
     flexDirection: 'row',
     marginTop: 5,
   },

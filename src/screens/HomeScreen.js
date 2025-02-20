@@ -1,4 +1,4 @@
-import { ImageBackground, StyleSheet, Text, View, TextInput, Image, ScrollView } from 'react-native';
+import { ImageBackground, StyleSheet, Text, View, TextInput, Image, FlatList } from 'react-native';
 import React from 'react';
 import { height, width } from '../assets/constants';
 import Pokeball_header from '../assets/Images/Pokeball-no-bg.png';
@@ -8,47 +8,38 @@ import Card from '../components/Card';
 const searchIcon = require('../assets/Icons/Search.png'); // Import the search icon
 
 const HomeScreen = () => {
+  const pokemons = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
   return (
     <View style={styles.container}>
       {/* Header Section */}
-      <ImageBackground
-        resizeMode="contain"
-        style={styles.bgImage}
-        source={Pokeball_header}
-      >
-        
-      </ImageBackground>
+      <ImageBackground resizeMode="contain" style={styles.bgImage} source={Pokeball_header} />
 
       <View style={styles.contents}>
-          <Text style={styles.heading}>Pokédex</Text>
-          <Text style={styles.subText}>
-            Search for Pokémon by name or using the National Pokédex number.
-          </Text>
+        <Text style={styles.heading}>Pokédex</Text>
+        <Text style={styles.subText}>
+          Search for Pokémon by name or using the National Pokédex number.
+        </Text>
 
-          {/* Search Bar with Icon */}
-          <View style={styles.searchContainer}>
-            <Image source={searchIcon} style={styles.searchIcon} />
-            <TextInput
-              style={styles.searchbar}
-              placeholder="What Pokémon are you looking for?"
-              placeholderTextColor={textColor.grey}
-            />
-          </View>
-        </View>s
+        {/* Search Bar with Icon */}
+        <View style={styles.searchContainer}>
+          <Image source={searchIcon} style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchbar}
+            placeholder="What Pokémon are you looking for?"
+            placeholderTextColor={textColor.grey}
+          />
+        </View>
+      </View>
 
-      {/* Scrollable Section (Cards) */}
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-      </ScrollView>
+      
+      <FlatList
+        data={pokemons} 
+        keyExtractor={(item, index) => index.toString()} 
+        renderItem={({ item }) => <Card item={item}/>} 
+        showsVerticalScrollIndicator={false} 
+        contentContainerStyle={styles.listContainer} 
+      />
     </View>
   );
 };
@@ -66,7 +57,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'absolute', // Fixes the header in place
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
@@ -106,7 +97,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: textColor.black,
   },
-  scrollContainer: {
-    
+  listContainer: {
+    paddingBottom: 20, // ✅ Ensures proper spacing at the bottom
   },
 });
