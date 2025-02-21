@@ -38,7 +38,7 @@ const Card = ({ item }) => {
 
         <View style={styles.row}>
           {pokemon.types.map((type, index) => (
-            <Tag key={index} type={type.type.name} />
+            <Tag style={styles.pokeTag} key={index} type={type.type.name} />
           ))}
         </View>
       </View>
@@ -99,6 +99,12 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     marginTop: 5,
+<<<<<<< HEAD
     marginRight: 55,
+=======
+    gap: 5,
+>>>>>>> 0cb21b871e91f30509e7a8f01fde2dbe065cd103
   },
+
+  
 });

@@ -1,5 +1,5 @@
-import { ImageBackground, StyleSheet, Text, View, TextInput, Image, FlatList } from 'react-native';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { ImageBackground, StyleSheet, Text, View, TextInput, Image, FlatList, ActivityIndicator } from 'react-native';
 import { height, width } from '../assets/constants';
 import Pokeball_header from '../assets/Images/Pokeball-no-bg.png';
 import { customColor, textColor } from '../assets/colors';
@@ -8,7 +8,31 @@ import Card from '../components/Card';
 const searchIcon = require('../assets/Icons/Search.png'); // Import the search icon
 
 const HomeScreen = () => {
-  const pokemons = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const [pokemonList, setPokemonList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Fetch all Pokémon from the API
+  useEffect(() => {
+    const fetchAllPokemon = async () => {
+      try {
+        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1000'); // Fetch all Pokémon
+        const data = await response.json();
+        setPokemonList(data.results); // Store the list of Pokémon
+      } catch (error) {
+        console.error('Error fetching Pokémon list:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllPokemon();
+  }, []);
+
+  // Filter Pokémon based on search query
+  const filteredPokemon = pokemonList.filter((pokemon) =>
+    pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <View style={styles.container}>
@@ -28,18 +52,24 @@ const HomeScreen = () => {
             style={styles.searchbar}
             placeholder="What Pokémon are you looking for?"
             placeholderTextColor={textColor.grey}
+            value={searchQuery}
+            onChangeText={(text) => setSearchQuery(text)} // Update search query
           />
         </View>
       </View>
 
-      
-      <FlatList
-        data={pokemons} 
-        keyExtractor={(item, index) => index.toString()} 
-        renderItem={({ item }) => <Card item={item}/>} 
-        showsVerticalScrollIndicator={false} 
-        contentContainerStyle={styles.listContainer} 
-      />
+      {/* Display loading indicator or Pokémon list */}
+      {loading ? (
+        <ActivityIndicator size="large" color="#000" style={styles.loader} />
+      ) : (
+        <FlatList
+          data={filteredPokemon}
+          keyExtractor={(item) => item.name}
+          renderItem={({ item }) => <Card item={item.name} />} // Pass Pokémon name to Card
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContainer}
+        />
+      )}
     </View>
   );
 };
@@ -84,7 +114,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 20,
     height: 60,
-    width: '90%',
     paddingHorizontal: 15,
   },
   searchIcon: {
@@ -98,6 +127,9 @@ const styles = StyleSheet.create({
     color: textColor.black,
   },
   listContainer: {
-    paddingBottom: 20, // ✅ Ensures proper spacing at the bottom
+    paddingBottom: 20, // Ensures proper spacing at the bottom
+  },
+  loader: {
+    marginTop: 20,
   },
 });
