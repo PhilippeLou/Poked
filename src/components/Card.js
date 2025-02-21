@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     position: 'absolute',
     right: 0,
-    top: -30,
+    top: -20,
     zIndex: 1000,
   },
   pokecard: {
@@ -99,5 +99,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     marginTop: 5,
+    marginRight: 55,
   },
 });
