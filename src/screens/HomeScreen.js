@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
     backgroundColor: customColor.input,
     borderRadius: 10,
     marginTop: 20,
+    marginBottom: 15,
     height: 60,
     paddingHorizontal: 15,
     width: '100%', // Ensure the search bar takes full width of its container
@@ -134,6 +135,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: textColor.black,
+    
   },
   listContainer: {
     paddingBottom: 20, // Ensures proper spacing at the bottom

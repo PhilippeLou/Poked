@@ -6,29 +6,37 @@ import PokeCard from '../assets/Images/pokecard.png';
 import Pattern from '../assets/Images/Pattern.png';
 
 const Card = ({ item }) => {
-  const [pokemon, setPokemon] = useState(null);
-  const [loading, setLoading] = useState(true);
+    const [pokemon, setPokemon] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null); // Add an error state
 
-  // Fetch Pokémon data from API
-  useEffect(() => {
-    const fetchPokemon = async () => {
-      try {
-        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${item}`);
-        const data = await response.json();
-        setPokemon(data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching Pokémon:', error);
-        setLoading(false);
-      }
-    };
+    useEffect(() => {
+        const fetchPokemon = async () => {
+            try {
+                const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${item}`);
+                if (!response.ok) { // Check for HTTP errors (e.g., 404)
+                  throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                setPokemon(data);
+            } catch (error) {
+                console.error('Error fetching Pokémon:', error);
+                setError(error.message); // Set the error message
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    fetchPokemon();
-  }, [item]);
+        fetchPokemon();
+    }, [item]);
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#fff" />;
-  }
+    if (loading) {
+        return <ActivityIndicator size="large" color="#fff" />;
+    }
+
+    if (error) {  // Display an error message if there's an error
+        return <View style={styles.errorContainer}><Text style={styles.errorText}>Error: {error}</Text></View>;
+    }
 
   return (
     <View style={{ ...styles.card, backgroundColor: backgroundColors[pokemon.types[0].type.name] || 'gray' }}>
@@ -103,5 +111,13 @@ const styles = StyleSheet.create({
     gap: 5,
   },
 
+  errorContainer: {
+    padding: 10,
+    backgroundColor: 'red', // Or any color you prefer
+    borderRadius: 5,
+  },
+  errorText: {
+    color: 'white',
+  },
   
 });
