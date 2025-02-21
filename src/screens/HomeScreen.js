@@ -1,24 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { ImageBackground, StyleSheet, Text, View, TextInput, Image, FlatList, ActivityIndicator } from 'react-native';
+import { ImageBackground, StyleSheet, Text, View, TextInput, Image, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { height, width } from '../assets/constants';
 import Pokeball_header from '../assets/Images/Pokeball-no-bg.png';
 import { customColor, textColor } from '../assets/colors';
 import Card from '../components/Card';
 
-const searchIcon = require('../assets/Icons/Search.png'); // Import the search icon
+const searchIcon = require('../assets/Icons/Search.png');
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => { // Accept navigation prop
   const [pokemonList, setPokemonList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Fetch all Pokémon from the API
   useEffect(() => {
     const fetchAllPokemon = async () => {
       try {
-        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1000'); // Fetch all Pokémon
+        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1000');
         const data = await response.json();
-        setPokemonList(data.results); // Store the list of Pokémon
+        setPokemonList(data.results);
       } catch (error) {
         console.error('Error fetching Pokémon list:', error);
       } finally {
@@ -29,17 +28,14 @@ const HomeScreen = () => {
     fetchAllPokemon();
   }, []);
 
-  // Filter Pokémon based on search query
   const filteredPokemon = pokemonList.filter((pokemon) =>
     pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <View style={styles.container}>
-      {/* Header Section - Full-Width Background Image */}
       <ImageBackground resizeMode="contain" style={styles.bgImage} source={Pokeball_header} />
 
-      {/* Padded Contents */}
       <View style={styles.paddedContainer}>
         <View style={styles.contents}>
           <Text style={styles.heading}>Pokédex</Text>
@@ -47,7 +43,6 @@ const HomeScreen = () => {
             Search for Pokémon by name or using the National Pokédex number.
           </Text>
 
-          {/* Search Bar with Icon */}
           <View style={styles.searchContainer}>
             <Image source={searchIcon} style={styles.searchIcon} />
             <TextInput
@@ -55,19 +50,22 @@ const HomeScreen = () => {
               placeholder="What Pokémon are you looking for?"
               placeholderTextColor={textColor.grey}
               value={searchQuery}
-              onChangeText={(text) => setSearchQuery(text)} // Update search query
+              onChangeText={(text) => setSearchQuery(text)}
             />
           </View>
         </View>
 
-        {/* Display loading indicator or Pokémon list */}
         {loading ? (
           <ActivityIndicator size="large" color="#000" style={styles.loader} />
         ) : (
           <FlatList
             data={filteredPokemon}
             keyExtractor={(item) => item.name}
-            renderItem={({ item }) => <Card item={item.name} />} // Pass Pokémon name to Card
+            renderItem={({ item }) => (
+              <TouchableOpacity onPress={() => navigation.navigate('Details', { pokemon: item })}>
+                <Card item={item.name} />
+              </TouchableOpacity>
+            )}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContainer}
           />
@@ -78,6 +76,7 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
+
 
 const styles = StyleSheet.create({
   container: {
