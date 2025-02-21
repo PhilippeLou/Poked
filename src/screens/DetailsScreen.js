@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { backgroundCard, backgroundColors } from '../assets/colors';
@@ -7,6 +7,13 @@ import Tag from '../components/Tag';
 import { customColor, textColor } from '../assets/colors';
 import PatternDetails from '../assets/Images/patternDetails.png';
 import CircleDetails from '../assets/Images/circleDetails.png';
+import AboutSection from '../components/AboutSection';
+import StatsSection from '../components/StatsSection';
+import EvolutionSection from '../components/AboutSection';
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+
+const Tab = createMaterialTopTabNavigator();
 
 const DetailsScreen = ({ route }) => {
   const { pokemon } = route.params;
@@ -14,47 +21,55 @@ const DetailsScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Ionicons name="arrow-back" size={24} color="black" />
+      </TouchableOpacity>
 
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.titleMain}>{pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</Text>
+      <Text style={styles.titleMain}>
+        {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
+      </Text>
 
-        <Text style={styles.pokeNumber}>{String(pokemon.id).padStart(4, '0')}</Text>
+      <Text style={styles.pokeNumber}>{String(pokemon.id).padStart(4, '0')}</Text>
 
-        <View style={{...styles.imageContainer, backgroundColor: backgroundColors[pokemon.types[0].type.name] || 'gray'}}>
-            <Image source={PatternDetails} style={styles.patternDetails} />
-            <Image source={PatternDetails} style={styles.patternDetailsTwo} />
-            <Image source={CircleDetails} style={styles.circleDetails} />
-            <Text
-                style={[
-                    styles.title,
-                    { 
-                    color: backgroundColors[pokemon.types[0].type.name] || 'gray',
-                    fontSize: pokemon.name.length > 10 ? 60 : 90, // Adjust size based on length
-                    }
-                ]}
-                numberOfLines={1}
-                adjustsFontSizeToFit={true} 
-                >
-                {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
-            </Text>
+      {/* Image Container */}
+      <View style={{ ...styles.imageContainer, backgroundColor: backgroundColors[pokemon.types[0].type.name] || 'gray' }}>
+        <Image source={PatternDetails} style={styles.patternDetails} />
+        <Image source={PatternDetails} style={styles.patternDetailsTwo} />
+        <Image source={CircleDetails} style={styles.circleDetails} />
 
+        <Text style={[
+          styles.title,
+          { color: backgroundColors[pokemon.types[0].type.name] || 'gray' }
+        ]}>
+          {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
+        </Text>
 
-            <Image 
-                source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemon.id}.png` }} 
-                style={styles.pokeImage} 
-            />
-            <View style={styles.row}>
-                {pokemon.types.map((type, index) => (
-                    <Tag style={styles.pokeTag} key={index} type={type.type.name} />
-                ))}
-             </View>
+        <Image 
+          source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemon.id}.png` }} 
+          style={styles.pokeImage} 
+        />
+
+        <View style={styles.row}>
+          {pokemon.types.map((type, index) => (
+            <Tag style={styles.pokeTag} key={index} type={type.type.name} />
+          ))}
         </View>
-            
-        
+      </View>
 
-      
+      {/* Tabs Section */}
+      <View style={styles.tabsContainer}>
+        <Tab.Navigator
+          screenOptions={{
+            tabBarLabelStyle: { color: 'black', fontSize: 14, fontWeight: 'bold' }, // Change tab title color to black
+            tabBarStyle: { backgroundColor: 'white' }, // Background color of tab bar
+            tabBarIndicatorStyle: { backgroundColor: 'black' }, // Active tab indicator color
+          }}
+        >
+          <Tab.Screen name="About" component={AboutSection} />
+          <Tab.Screen name="Stats" component={StatsSection} />
+          <Tab.Screen name="Evolution" component={EvolutionSection} />
+        </Tab.Navigator>
+      </View>
     </View>
   );
 };
@@ -131,6 +146,10 @@ const styles = StyleSheet.create({
     left: 60,
     height: 200,
     width: 200,
-  }
+  },
+  tabsContainer: {
+    flex: 1,
+    width: '100%',
+  },
   
 });

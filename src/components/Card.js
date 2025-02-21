@@ -45,7 +45,7 @@ const Card = ({ item, onPress }) => {
     }
 
     return (
-        <TouchableOpacity onPress={() => navigation.navigate('Details', { pokemon })} // ✅ Pass Pokémon data
+        <TouchableOpacity onPress={() => navigation.navigate('Details', { pokemon })}
         activeOpacity={0.7}>
             <View style={{ ...styles.card, backgroundColor: backgroundColors[pokemon.types[0].type.name] || 'gray' }}>
                 <View>
