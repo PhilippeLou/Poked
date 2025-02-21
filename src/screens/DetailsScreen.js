@@ -1,25 +1,35 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { backgroundCard } from '../assets/colors';
+import Tag from '../components/Tag';
+import { customColor, textColor } from '../assets/colors';
 
 const DetailsScreen = ({ route }) => {
-  const { pokemon } = route.params; // Receive the Pokémon data
+  const { pokemon } = route.params;
+  const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</Text>
+
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="black" />
+        </TouchableOpacity>
+
+        <Text style={styles.title}>{pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</Text>
+        <Text style={styles.pokeNumber}>{String(pokemon.id).padStart(4, '0')}</Text>
+
+        <View style={{...styles.imageContainer, backgroundColor: backgroundCard[pokemon.types[0].type.name] || 'gray'}}>
+            <Image 
+                source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.id}.png` }} 
+                style={styles.pokeImage} 
+            />
+        </View>
+            
+        
+
       
-      <Image 
-        source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.id}.png` }} 
-        style={styles.pokeImage} 
-      />
-
-      <Text style={styles.pokeNumber}>#{String(pokemon.id).padStart(4, '0')}</Text>
-
-      <View style={styles.typesContainer}>
-        {pokemon.types.map((type, index) => (
-          <Text key={index} style={styles.typeBadge}>{type.type.name}</Text>
-        ))}
-      </View>
     </View>
   );
 };
@@ -27,21 +37,22 @@ const DetailsScreen = ({ route }) => {
 export default DetailsScreen;
 
 const styles = StyleSheet.create({
+    backButton: {
+        position: 'absolute',
+        top: 0,
+        left: 20,
+        padding: 10,
+    },
   container: {
+    marginTop: 80,
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f8f9fa',
+    
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     textTransform: 'capitalize',
-  },
-  pokeNumber: {
-    fontSize: 18,
-    marginVertical: 10,
-    color: 'gray',
   },
   pokeImage: {
     width: 200,
@@ -49,17 +60,12 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginVertical: 20,
   },
-  typesContainer: {
-    flexDirection: 'row',
-    gap: 10,
-    marginTop: 10,
+  imageContainer: {
+    marginTop: 40,
+    paddingVertical: 100,
+    paddingHorizontal: 65,
+    backgroundColor: 'yellow',
+    borderRadius: 20,
   },
-  typeBadge: {
-    backgroundColor: '#ddd',
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderRadius: 15,
-    textTransform: 'capitalize',
-    fontSize: 16,
-  },
+  
 });

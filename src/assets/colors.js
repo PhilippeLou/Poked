@@ -40,6 +40,28 @@ const backgroundColors = {
     water: '#58ABF6',
 }
 
+const backgroundCard = {
+    bug: '#C3E6CB',      // Soft green  
+    dark: '#A8A8B6',     // Muted grayish  
+    dragon: '#A4B3DA',   // Soft periwinkle  
+    electric: '#FCEEA7', // Pastel yellow  
+    fairy: '#F7C6D9',    // Soft pink  
+    fighting: '#E6A1A1', // Muted red  
+    fire: '#FFC8A2',     // Soft orange  
+    flying: '#B6CFF5',   // Soft sky blue  
+    ghost: '#B5A5D7',    // Muted lavender  
+    grass: '#CDE8C4',    // Light green  
+    ground: '#E3C8A2',   // Soft beige  
+    ice: '#C3E8E7',      // Pale blue  
+    normal: '#D8D8D8',   // Soft gray  
+    poison: '#D5A6BD',   // Muted purple-pink  
+    psychic: '#F7B6C2',  // Soft coral  
+    rock: '#E4D4B7',     // Warm beige  
+    steel: '#A6C3D9',    // Soft blue-gray  
+    water: '#A9D3F2',    // Light blue  
+  };
+  
+
 const textColor = {
     white: '#fff',
     black: '#17171b',
@@ -51,4 +73,4 @@ const customColor = {
     input: '#f2f2f2'
 }
 
-export {colors, backgroundColors, textColor, customColor};
+export {colors, backgroundColors, textColor, customColor, backgroundCard};
