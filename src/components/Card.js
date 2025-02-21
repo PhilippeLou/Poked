@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   cardPattern: {
     position: 'absolute',
-    left: 130,
+    left: 100,
     top: 0,
     width: 100,
   },

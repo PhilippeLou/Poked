@@ -36,40 +36,43 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Header Section */}
+      {/* Header Section - Full-Width Background Image */}
       <ImageBackground resizeMode="contain" style={styles.bgImage} source={Pokeball_header} />
 
-      <View style={styles.contents}>
-        <Text style={styles.heading}>Pokédex</Text>
-        <Text style={styles.subText}>
-          Search for Pokémon by name or using the National Pokédex number.
-        </Text>
+      {/* Padded Contents */}
+      <View style={styles.paddedContainer}>
+        <View style={styles.contents}>
+          <Text style={styles.heading}>Pokédex</Text>
+          <Text style={styles.subText}>
+            Search for Pokémon by name or using the National Pokédex number.
+          </Text>
 
-        {/* Search Bar with Icon */}
-        <View style={styles.searchContainer}>
-          <Image source={searchIcon} style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchbar}
-            placeholder="What Pokémon are you looking for?"
-            placeholderTextColor={textColor.grey}
-            value={searchQuery}
-            onChangeText={(text) => setSearchQuery(text)} // Update search query
-          />
+          {/* Search Bar with Icon */}
+          <View style={styles.searchContainer}>
+            <Image source={searchIcon} style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchbar}
+              placeholder="What Pokémon are you looking for?"
+              placeholderTextColor={textColor.grey}
+              value={searchQuery}
+              onChangeText={(text) => setSearchQuery(text)} // Update search query
+            />
+          </View>
         </View>
-      </View>
 
-      {/* Display loading indicator or Pokémon list */}
-      {loading ? (
-        <ActivityIndicator size="large" color="#000" style={styles.loader} />
-      ) : (
-        <FlatList
-          data={filteredPokemon}
-          keyExtractor={(item) => item.name}
-          renderItem={({ item }) => <Card item={item.name} />} // Pass Pokémon name to Card
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContainer}
-        />
-      )}
+        {/* Display loading indicator or Pokémon list */}
+        {loading ? (
+          <ActivityIndicator size="large" color="#000" style={styles.loader} />
+        ) : (
+          <FlatList
+            data={filteredPokemon}
+            keyExtractor={(item) => item.name}
+            renderItem={({ item }) => <Card item={item.name} />} // Pass Pokémon name to Card
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.listContainer}
+          />
+        )}
+      </View>
     </View>
   );
 };
@@ -92,8 +95,13 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
+  paddedContainer: {
+    flex: 1,
+    paddingHorizontal: 20, // Add space on the sides for all content except bgImage
+    marginTop: height / 5.5 - 40, // Adjust margin to account for bgImage height
+  },
   contents: {
-    marginTop: 100,
+    marginTop: 20, // Adjust spacing between bgImage and contents
   },
   heading: {
     fontSize: 35,
@@ -115,6 +123,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     height: 60,
     paddingHorizontal: 15,
+    width: '100%', // Ensure the search bar takes full width of its container
   },
   searchIcon: {
     width: 24,
