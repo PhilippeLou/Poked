@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { backgroundColors } from '../assets/colors';
 import Tag from './Tag';
 import PokeCard from '../assets/Images/pokecard.png';
-import Pattern from '../assets/Images/Pattern.png';
+import Pattern from '../assets/Images/patternDetails.png';
 import { useNavigation } from '@react-navigation/native';
 
 const Card = ({ item, onPress }) => {
@@ -61,7 +61,7 @@ const Card = ({ item, onPress }) => {
 
                 {/* Pokémon Image */}
                 <Image 
-                    source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.id}.png` }} 
+                    source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemon.id}.png` }} 
                     style={styles.pokeImage} 
                 />
 
@@ -109,9 +109,9 @@ const styles = StyleSheet.create({
   },
   cardPattern: {
     position: 'absolute',
-    left: 100,
-    top: 0,
-    width: 100,
+    left: 130,
+    top: -5,
+    width: 70,
   },
   row: {
     flexDirection: 'row',

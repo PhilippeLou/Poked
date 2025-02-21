@@ -2,9 +2,11 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { backgroundCard } from '../assets/colors';
+import { backgroundCard, backgroundColors } from '../assets/colors';
 import Tag from '../components/Tag';
 import { customColor, textColor } from '../assets/colors';
+import PatternDetails from '../assets/Images/patternDetails.png';
+import CircleDetails from '../assets/Images/circleDetails.png';
 
 const DetailsScreen = ({ route }) => {
   const { pokemon } = route.params;
@@ -20,11 +22,19 @@ const DetailsScreen = ({ route }) => {
         <Text style={styles.title}>{pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</Text>
         <Text style={styles.pokeNumber}>{String(pokemon.id).padStart(4, '0')}</Text>
 
-        <View style={{...styles.imageContainer, backgroundColor: backgroundCard[pokemon.types[0].type.name] || 'gray'}}>
+        <View style={{...styles.imageContainer, backgroundColor: backgroundColors[pokemon.types[0].type.name] || 'gray'}}>
+            <Image source={PatternDetails} style={styles.patternDetails} />
+            <Image source={PatternDetails} style={styles.patternDetailsTwo} />
+            <Image source={CircleDetails} style={styles.circleDetails} />
             <Image 
-                source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.id}.png` }} 
+                source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemon.id}.png` }} 
                 style={styles.pokeImage} 
             />
+            <View style={styles.row}>
+                {pokemon.types.map((type, index) => (
+                    <Tag style={styles.pokeTag} key={index} type={type.type.name} />
+                ))}
+             </View>
         </View>
             
         
@@ -59,13 +69,42 @@ const styles = StyleSheet.create({
     height: 200,
     resizeMode: 'contain',
     marginVertical: 20,
+    zIndex: 1000,
+    marginTop: -10,
   },
   imageContainer: {
     marginTop: 40,
-    paddingVertical: 100,
+    paddingVertical: 90,
     paddingHorizontal: 65,
     backgroundColor: 'yellow',
     borderRadius: 20,
   },
+  row: {
+    marginTop: -10,
+    flexDirection: 'row',
+    gap: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  patternDetails: {
+    width: 80,
+    position: 'absolute',
+    right: 5,
+    top: 120,
+  },
+  patternDetailsTwo: {
+    width: 80,
+    position: 'absolute',
+    left: 5,
+    top: 290,
+  },
+
+  circleDetails: {
+    position: 'absolute',
+    top: 100,
+    left: 60,
+    height: 200,
+    width: 200,
+  }
   
 });
