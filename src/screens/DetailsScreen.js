@@ -26,9 +26,20 @@ const DetailsScreen = ({ route }) => {
             <Image source={PatternDetails} style={styles.patternDetails} />
             <Image source={PatternDetails} style={styles.patternDetailsTwo} />
             <Image source={CircleDetails} style={styles.circleDetails} />
-            <Text style={[styles.title, { color: backgroundColors[pokemon.types[0].type.name] || 'gray' }]}>
+            <Text
+                style={[
+                    styles.title,
+                    { 
+                    color: backgroundColors[pokemon.types[0].type.name] || 'gray',
+                    fontSize: pokemon.name.length > 10 ? 60 : 90, // Adjust size based on length
+                    }
+                ]}
+                numberOfLines={1}
+                adjustsFontSizeToFit={true} 
+                >
                 {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
             </Text>
+
 
             <Image 
                 source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemon.id}.png` }} 
@@ -69,9 +80,9 @@ const styles = StyleSheet.create({
   },
   title: {
     position: 'absolute',
-    top: 30,  // Adjust the top position
+    top: 10,  // Adjust the top position
     alignSelf: 'center',  // Centers the text horizontally
-    fontSize: 60,
+    fontSize: 50,
     fontWeight: "bold",
     textTransform: "uppercase",
     textShadowColor: "white",  // Shadow color for stroke effect
