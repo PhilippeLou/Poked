@@ -18,14 +18,18 @@ const DetailsScreen = ({ route }) => {
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
+        <Text style={styles.titleMain}>{pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</Text>
 
-        <Text style={styles.title}>{pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</Text>
         <Text style={styles.pokeNumber}>{String(pokemon.id).padStart(4, '0')}</Text>
 
         <View style={{...styles.imageContainer, backgroundColor: backgroundColors[pokemon.types[0].type.name] || 'gray'}}>
             <Image source={PatternDetails} style={styles.patternDetails} />
             <Image source={PatternDetails} style={styles.patternDetailsTwo} />
             <Image source={CircleDetails} style={styles.circleDetails} />
+            <Text style={[styles.title, { color: backgroundColors[pokemon.types[0].type.name] || 'gray' }]}>
+                {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
+            </Text>
+
             <Image 
                 source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemon.id}.png` }} 
                 style={styles.pokeImage} 
@@ -57,13 +61,24 @@ const styles = StyleSheet.create({
     marginTop: 80,
     flex: 1,
     alignItems: 'center',
-    
+  },
+  titleMain: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textTransform: "uppercase",
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    textTransform: 'capitalize',
+    position: 'absolute',
+    top: 30,  // Adjust the top position
+    alignSelf: 'center',  // Centers the text horizontally
+    fontSize: 60,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    textShadowColor: "white",  // Shadow color for stroke effect
+    textShadowOffset: { width: 2, height: 2 },  // Stronger stroke effect
+    textShadowRadius: 3,
   },
+  
   pokeImage: {
     width: 200,
     height: 200,

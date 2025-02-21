@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     position: 'absolute',
     right: 0,
-    top: -20,
+    top: -30,
     zIndex: 1000,
   },
   pokecard: {
