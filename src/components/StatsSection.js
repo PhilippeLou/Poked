@@ -71,12 +71,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   statName: {
-    width: 100,
+    width: 100, 
     fontSize: 16,
     color: textColor.black,
   },
   statValue: {
-    width: 40,
+    width: 30,
     fontSize: 16,
     color: textColor.black,
     textAlign: 'right',
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   },
   statBarContainer: {
     flex: 1,
-    height: 10,
+    height: 7,
     backgroundColor: 'transparent',
     borderRadius: 5,
     overflow: 'hidden',

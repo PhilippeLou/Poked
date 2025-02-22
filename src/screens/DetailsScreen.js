@@ -82,7 +82,7 @@ const DetailsScreen = ({ route }) => {
             {() => <StatsSection pokemon = {pokemon} />}
           </Tab.Screen>
           <Tab.Screen name="Evolution">
-            {() => <EvolutionSection pokemon = {pokemon} />}
+            {() => <EvolutionSection pokemon = {pokemon} species={species} />}
           </Tab.Screen>
         </Tab.Navigator>
       </View>

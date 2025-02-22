@@ -103,10 +103,9 @@ const styles = StyleSheet.create({
     marginTop: 20, // Adjust spacing between bgImage and contents
   },
   heading: {
-    fontSize: 35,
-    fontWeight: '900',
+    fontSize: 45,
+    fontWeight: 'bold',
     color: textColor.black,
-    fontFamily: 'SF-Pro-Display-Bold',
   },
   subText: {
     fontSize: 16,
