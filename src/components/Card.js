@@ -45,29 +45,31 @@ const Card = ({ item, onPress }) => {
     }
 
     return (
-        <TouchableOpacity onPress={() => navigation.navigate('Details', { pokemon })}
-        activeOpacity={0.7}>
-            <View style={{ ...styles.card, backgroundColor: backgroundColors[pokemon.types[0].type.name] || 'gray' }}>
-                <View>
-                    <Text style={styles.pokeNumber}>#{String(pokemon.id).padStart(4, '0')}</Text>
-                    <Text style={styles.pokeName}>{pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</Text>
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('Details', { pokemon })}
+          activeOpacity={0.7}
+          >
+              <View style={{ ...styles.card, backgroundColor: backgroundColors[pokemon.types[0].type.name] || 'gray' }}>
+                  <View>
+                      <Text style={styles.pokeNumber}>#{String(pokemon.id).padStart(4, '0')}</Text>
+                      <Text style={styles.pokeName}>{pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</Text>
 
-                    <View style={styles.row}>
-                        {pokemon.types.map((type, index) => (
-                            <Tag style={styles.pokeTag} key={index} type={type.type.name} />
-                        ))}
-                    </View>
-                </View>
+                      <View style={styles.row}>
+                          {pokemon.types.map((type, index) => (
+                              <Tag style={styles.pokeTag} key={index} type={type.type.name} />
+                          ))}
+                      </View>
+                  </View>
 
-                {/* Pokémon Image */}
-                <Image 
-                    source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemon.id}.png` }} 
-                    style={styles.pokeImage} 
-                />
+                  {/* Pokémon Image */}
+                  <Image 
+                      source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemon.id}.png` }} 
+                      style={styles.pokeImage} 
+                  />
 
-                <Image source={Pattern} style={styles.cardPattern} />
-                <Image source={PokeCard} style={styles.pokecard} />
-            </View>
+                  <Image source={Pattern} style={styles.cardPattern} />
+                  <Image source={PokeCard} style={styles.pokecard} />
+              </View>
         </TouchableOpacity>
     );
 };

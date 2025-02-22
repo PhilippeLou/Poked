@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { backgroundCard, backgroundColors } from '../assets/colors';
@@ -9,8 +9,7 @@ import PatternDetails from '../assets/Images/patternDetails.png';
 import CircleDetails from '../assets/Images/circleDetails.png';
 import AboutSection from '../components/AboutSection';
 import StatsSection from '../components/StatsSection';
-import EvolutionSection from '../components/AboutSection';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import EvolutionSection from '../components/EvolutionSection';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
 const Tab = createMaterialTopTabNavigator();
@@ -60,9 +59,9 @@ const DetailsScreen = ({ route }) => {
       <View style={styles.tabsContainer}>
         <Tab.Navigator
           screenOptions={{
-            tabBarLabelStyle: { color: 'black', fontSize: 14, fontWeight: 'bold' }, // Change tab title color to black
-            tabBarStyle: { backgroundColor: 'white' }, // Background color of tab bar
-            tabBarIndicatorStyle: { backgroundColor: 'black' }, // Active tab indicator color
+            tabBarLabelStyle: { color: textColor.black, fontSize: 14, fontWeight: 'bold' },
+            tabBarStyle: { backgroundColor: 'white' },
+            tabBarIndicatorStyle: { backgroundColor: backgroundColors[pokemon.types[0].type.name] || 'black' }, // Dynamic indicator color
           }}
         >
           <Tab.Screen name="About" component={AboutSection} />
