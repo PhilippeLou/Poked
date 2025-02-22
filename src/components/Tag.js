@@ -6,7 +6,7 @@ import Icon from './Icon';
 const Tag = ({ type }) => {
   return (
     <View style={{ ...styles.tag, backgroundColor: colors[type] }}>
-      <Icon name={type} style={styles.icon} /> {/* ✅ Now it correctly uses the type */}
+      <Icon name={type} style={styles.icon} />
       <Text style={styles.text}>{type.toUpperCase()}</Text>
     </View>
   );

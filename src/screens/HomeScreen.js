@@ -40,14 +40,14 @@ const HomeScreen = ({ navigation }) => { // Accept navigation prop
         <View style={styles.contents}>
           <Text style={styles.heading}>Pokédex</Text>
           <Text style={styles.subText}>
-            Search for Pokémon by name or using the National Pokédex number.
+            Find your favorite Pokémon by name or National Pokédex number.
           </Text>
 
           <View style={styles.searchContainer}>
             <Image source={searchIcon} style={styles.searchIcon} />
             <TextInput
               style={styles.searchbar}
-              placeholder="What Pokémon are you looking for?"
+              placeholder="Search for a Pokemon..."
               placeholderTextColor={textColor.grey}
               value={searchQuery}
               onChangeText={(text) => setSearchQuery(text)}

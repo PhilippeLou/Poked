@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -17,6 +17,17 @@ const Tab = createMaterialTopTabNavigator();
 const DetailsScreen = ({ route }) => {
   const { pokemon } = route.params;
   const navigation = useNavigation();
+
+  const [species, setSpecies] = useState(null);
+
+  useEffect(() => {
+    const fetchSpecies = async () => {
+      const response = await fetch(pokemon.species.url);
+      const data = await response.json();
+      setSpecies(data);
+    };
+    fetchSpecies();
+  }, [pokemon.species.url]);
 
   return (
     <View style={styles.container}>
@@ -64,9 +75,15 @@ const DetailsScreen = ({ route }) => {
             tabBarIndicatorStyle: { backgroundColor: backgroundColors[pokemon.types[0].type.name] || 'black' }, // Dynamic indicator color
           }}
         >
-          <Tab.Screen name="About" component={AboutSection} />
-          <Tab.Screen name="Stats" component={StatsSection} />
-          <Tab.Screen name="Evolution" component={EvolutionSection} />
+          <Tab.Screen name="About">
+            {() => <AboutSection pokemon={pokemon} species={species} />}
+          </Tab.Screen>
+          <Tab.Screen name="Stats">
+            {() => <StatsSection pokemon = {pokemon} />}
+          </Tab.Screen>
+          <Tab.Screen name="Evolution">
+            {() => <EvolutionSection pokemon = {pokemon} />}
+          </Tab.Screen>
         </Tab.Navigator>
       </View>
     </View>
