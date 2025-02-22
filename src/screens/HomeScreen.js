@@ -4,6 +4,7 @@ import { height, width } from '../assets/constants';
 import Pokeball_header from '../assets/Images/Pokeball-no-bg.png';
 import { customColor, textColor } from '../assets/colors';
 import Card from '../components/Card';
+import PokedexImage from '../assets/Images/poketitle.png';
 
 const searchIcon = require('../assets/Icons/Search.png');
 
@@ -38,9 +39,9 @@ const HomeScreen = ({ navigation }) => { // Accept navigation prop
 
       <View style={styles.paddedContainer}>
         <View style={styles.contents}>
-          <Text style={styles.heading}>Pokédex</Text>
+          <Image source={PokedexImage} style={styles.pokeTItle} />
           <Text style={styles.subText}>
-            Find your favorite Pokémon by name or National Pokédex number.
+            Find your favorite Pokémon by name and look for their details.
           </Text>
 
           <View style={styles.searchContainer}>
@@ -86,7 +87,7 @@ const styles = StyleSheet.create({
   bgImage: {
     width: '100%',
     height: height / 4,
-    marginTop: 40,
+    marginTop: 30,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
@@ -94,10 +95,17 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
+  pokeTItle: {
+    width: 300,
+    height: 80,
+    marginVertical: 20,
+    marginTop: -20,
+    marginLeft: 30,
+  },
   paddedContainer: {
     flex: 1,
     paddingHorizontal: 20, // Add space on the sides for all content except bgImage
-    marginTop: height / 5.5 - 40, // Adjust margin to account for bgImage height
+    marginTop: height / 8 - 40, // Adjust margin to account for bgImage height
   },
   contents: {
     marginTop: 20, // Adjust spacing between bgImage and contents

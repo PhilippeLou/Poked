@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     color: 'white',
     textTransform: 'capitalize',
+    fontWeight: 'bold',
   },
   pokeNumber: {
     fontSize: 12,

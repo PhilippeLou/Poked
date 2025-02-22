@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   pokedexData: {
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: 'bold',
     marginBottom: 10,
   },

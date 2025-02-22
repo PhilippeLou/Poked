@@ -95,18 +95,19 @@ export default DetailsScreen;
 const styles = StyleSheet.create({
     backButton: {
         position: 'absolute',
-        top: 0,
+        top: 55,
         left: 20,
         padding: 10,
     },
   container: {
-    marginTop: 80,
+    paddingTop: 60,
     flex: 1,
     alignItems: 'center',
+    backgroundColor: 'white',
   },
   titleMain: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 30,
+    fontWeight: 'bold',
     textTransform: "uppercase",
   },
   title: {
