@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { textColor, backgroundColors } from '../assets/colors';
+import EvolutionBackground from '../assets/Images/evoBG.png'; // Import the background image
 
 const EvolutionSection = ({ pokemon, species }) => {
   const [evolutionChain, setEvolutionChain] = useState(null);
@@ -83,7 +84,9 @@ const EvolutionSection = ({ pokemon, species }) => {
               <View key={step.id} style={styles.evolutionStep}>
                 {/* First Row: Pokémon Images and Level */}
                 <View style={styles.imageRow}>
+                  {/* First Pokémon */}
                   <View style={styles.pokemonContainer}>
+                    <Image source={EvolutionBackground} style={styles.backgroundImage} />
                     <Image
                       source={{
                         uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${step.id}.png`,
@@ -91,8 +94,13 @@ const EvolutionSection = ({ pokemon, species }) => {
                       style={styles.pokemonImage}
                     />
                   </View>
+
+                  {/* Evolution Level */}
                   <Text style={styles.levelText}>(Level {evolutionLevel})</Text>
+
+                  {/* Next Pokémon */}
                   <View style={styles.pokemonContainer}>
+                    <Image source={EvolutionBackground} style={styles.backgroundImage} />
                     <Image
                       source={{
                         uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${nextStep.id}.png`,
@@ -167,15 +175,23 @@ const styles = StyleSheet.create({
   },
   pokemonContainer: {
     alignItems: 'center',
+    position: 'relative', // Needed for absolute positioning of the background
+  },
+  backgroundImage: {
+    width: 100, // Adjust based on your image size
+    height: 100, // Adjust based on your image size
+    position: 'absolute', // Position the background behind the Pokémon image
   },
   pokemonImage: {
     width: 80,
     height: 80,
     resizeMode: 'contain',
+    zIndex: 1, // Ensure the Pokémon image is above the background
   },
   pokemonName: {
     fontSize: 18,
     color: textColor.black,
+    marginTop: 5,
   },
   levelText: {
     fontSize: 16,
