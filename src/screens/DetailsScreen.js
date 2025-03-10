@@ -1,15 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { backgroundColors, textColor } from '../assets/colors';
-import Tag from '../components/Tag';
-import PatternDetails from '../assets/Images/patternDetails.png';
-import CircleDetails from '../assets/Images/circleDetails.png';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import AboutSection from '../components/AboutSection';
 import StatsSection from '../components/StatsSection';
 import EvolutionSection from '../components/EvolutionSection';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import Tag from '../components/Tag';
+import { backgroundColors, textColor } from '../assets/colors';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -18,32 +16,25 @@ const DetailsScreen = () => {
   const route = useRoute();
   const { pokemon } = route.params || {};
 
-  const [pokemonData, setPokemonData] = useState(null);
   const [species, setSpecies] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchSpecies = async () => {
-      if (!pokemon) {
-        setError('No Pokémon data provided.');
+      if (!pokemon?.species?.url) {
+        setError('No species data available.');
         setLoading(false);
         return;
       }
 
       try {
-        setPokemonData(pokemon); // Use passed pokemon data
-        if (!pokemon.species?.url) {
-          setLoading(false);
-          return;
-        }
-
         const response = await fetch(pokemon.species.url);
         if (!response.ok) throw new Error('Failed to fetch species data.');
         const data = await response.json();
         setSpecies(data);
       } catch (err) {
-        console.error('Error fetching species data:', err);
+        console.error('Error fetching species:', err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -51,24 +42,19 @@ const DetailsScreen = () => {
     };
 
     fetchSpecies();
-  }, [pokemon]);
-
-  // Memoize capitalized name for performance
-  const getPokemonName = useCallback(() => {
-    return pokemonData?.name ? pokemonData.name.charAt(0).toUpperCase() + pokemonData.name.slice(1) : '';
-  }, [pokemonData]);
+  }, [pokemon?.species?.url]);
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={backgroundColors[pokemon?.types?.[0]?.type?.name] || 'gray'} />
+      <View style={styles.centeredContainer}>
+        <ActivityIndicator size="large" color="blue" />
       </View>
     );
   }
 
-  if (error || !pokemonData) {
+  if (error || !pokemon) {
     return (
-      <View style={styles.errorContainer}>
+      <View style={styles.centeredContainer}>
         <Text style={styles.errorText}>{error || 'No Pokémon data available.'}</Text>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.goBackButton}>
           <Text style={styles.goBackText}>Go Back</Text>
@@ -79,28 +65,22 @@ const DetailsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()} activeOpacity={0.7}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={28} color={textColor.black} />
       </TouchableOpacity>
 
-      <Text style={styles.titleMain}>{getPokemonName()}</Text>
-      <Text style={styles.pokeNumber}>#{String(pokemonData.id).padStart(4, '0')}</Text>
+      <Text style={styles.title}>{pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</Text>
+      <Text style={styles.pokeNumber}>#{String(pokemon.id).padStart(4, '0')}</Text>
 
-      <View style={[styles.imageContainer, { backgroundColor: backgroundColors[pokemonData.types?.[0]?.type?.name] || 'gray' }]}>
-        <Image source={PatternDetails} style={styles.patternDetails} />
-        <Image source={PatternDetails} style={styles.patternDetailsTwo} />
-        <Image source={CircleDetails} style={styles.circleDetails} />
-
+      <View style={[styles.imageContainer, { backgroundColor: backgroundColors[pokemon.types?.[0]?.type?.name] || 'gray' }]}>
         <Image
-          source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemonData.id}.png` }}
+          source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemon.id}.png` }}
           style={styles.pokeImage}
-          onError={() => console.warn(`Failed to load image for ${pokemonData.name}`)}
-          defaultSource={require('../assets/Images/placeholder.png')} // Placeholder if image fails
+          onError={() => console.warn('Image failed to load')}
         />
-
-        <View style={styles.typeRow}>
-          {pokemonData.types?.map((type) => (
-            <Tag key={type.type.name} type={type.type.name} />
+        <View style={styles.tagRow}>
+          {pokemon.types?.map((type, index) => (
+            <Tag key={index} type={type.type.name} />
           ))}
         </View>
       </View>
@@ -110,21 +90,17 @@ const DetailsScreen = () => {
           screenOptions={{
             tabBarLabelStyle: styles.tabLabel,
             tabBarStyle: styles.tabBar,
-            tabBarIndicatorStyle: {
-              backgroundColor: backgroundColors[pokemonData.types?.[0]?.type?.name] || 'black',
-              height: 3,
-            },
-            swipeEnabled: true, // Enable swipe for better UX
+            tabBarIndicatorStyle: { backgroundColor: backgroundColors[pokemon.types?.[0]?.type?.name] || 'black' },
           }}
         >
           <Tab.Screen name="About">
-            {() => <AboutSection pokemon={pokemonData} species={species} />}
+            {() => <AboutSection pokemon={pokemon} species={species} />}
           </Tab.Screen>
           <Tab.Screen name="Stats">
-            {() => <StatsSection pokemon={pokemonData} />}
+            {() => <StatsSection pokemon={pokemon} />}
           </Tab.Screen>
           <Tab.Screen name="Evolution">
-            {() => <EvolutionSection pokemon={pokemonData} species={species} navigation={navigation} />}
+            {() => <EvolutionSection pokemon={pokemon} species={species} />}
           </Tab.Screen>
         </Tab.Navigator>
       </View>
@@ -137,7 +113,7 @@ export default DetailsScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: textColor.white,
+    backgroundColor: 'white',
     paddingTop: 50,
   },
   backButton: {
@@ -145,85 +121,55 @@ const styles = StyleSheet.create({
     top: 45,
     left: 15,
     padding: 10,
-    zIndex: 1, // Ensure it’s above other elements
+    zIndex: 10,
   },
-  titleMain: {
-    fontSize: 32,
+  title: {
+    fontSize: 30,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: textColor.black,
     marginTop: 10,
   },
   pokeNumber: {
     fontSize: 18,
     color: textColor.grey,
     textAlign: 'center',
-    marginBottom: 10,
   },
   imageContainer: {
     marginTop: 20,
-    paddingVertical: 60,
+    paddingVertical: 50,
     paddingHorizontal: 50,
     borderRadius: 20,
     alignItems: 'center',
-    elevation: 5, // Add shadow for depth
+    elevation: 5,
   },
   pokeImage: {
     width: 220,
     height: 220,
     resizeMode: 'contain',
-    marginVertical: 15,
+    marginVertical: 10,
   },
-  typeRow: {
+  tagRow: {
     flexDirection: 'row',
-    gap: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexWrap: 'wrap', // Handle multiple types
-  },
-  patternDetails: {
-    width: 80,
-    position: 'absolute',
-    right: 5,
-    top: 100,
-  },
-  patternDetailsTwo: {
-    width: 80,
-    position: 'absolute',
-    left: 5,
-    top: 260,
-  },
-  circleDetails: {
-    position: 'absolute',
-    top: 80,
-    left: 50,
-    height: 200,
-    width: 200,
+    gap: 5,
+    marginTop: 10,
   },
   tabsContainer: {
     flex: 1,
     width: '100%',
   },
   tabBar: {
-    backgroundColor: textColor.white,
-    elevation: 2, // Subtle shadow
+    backgroundColor: 'white',
+    elevation: 3,
   },
   tabLabel: {
     color: textColor.black,
     fontSize: 14,
-    fontWeight: '600',
-    textTransform: 'capitalize',
+    fontWeight: 'bold',
   },
-  loadingContainer: {
+  centeredContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
   },
   errorText: {
     fontSize: 18,
@@ -233,13 +179,13 @@ const styles = StyleSheet.create({
   },
   goBackButton: {
     paddingVertical: 10,
-    paddingHorizontal: 25,
-    borderRadius: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
     backgroundColor: '#007BFF',
   },
   goBackText: {
     fontSize: 16,
-    color: textColor.white,
+    color: 'white',
     fontWeight: 'bold',
   },
 });
