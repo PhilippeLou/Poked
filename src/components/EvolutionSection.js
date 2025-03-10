@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { textColor, backgroundColors } from '../assets/colors';
 import EvolutionBackground from '../assets/Images/evoBG.png';
 
-const EvolutionSection = ({ pokemon, species, navigation }) => {
+const EvolutionSection = ({ pokemon, species }) => {
   const [evolutionChain, setEvolutionChain] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -59,29 +59,21 @@ const EvolutionSection = ({ pokemon, species, navigation }) => {
             return (
               <View key={step.id} style={styles.evolutionStep}>
                 <View style={styles.imageRow}>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate('Details', { url: `https://pokeapi.co/api/v2/pokemon/${step.id}/` })}
-                  >
-                    <View style={styles.pokemonContainer}>
-                      <Image source={EvolutionBackground} style={styles.backgroundImage} />
-                      <Image
-                        source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${step.id}.png` }}
-                        style={styles.pokemonImage}
-                      />
-                    </View>
-                  </TouchableOpacity>
+                  <View style={styles.pokemonContainer}>
+                    <Image source={EvolutionBackground} style={styles.backgroundImage} />
+                    <Image
+                      source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${step.id}.png` }}
+                      style={styles.pokemonImage}
+                    />
+                  </View>
                   <Text style={styles.triggerText}>{trigger}</Text>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate('Details', { url: `https://pokeapi.co/api/v2/pokemon/${nextStep.id}/` })}
-                  >
-                    <View style={styles.pokemonContainer}>
-                      <Image source={EvolutionBackground} style={styles.backgroundImage} />
-                      <Image
-                        source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${nextStep.id}.png` }}
-                        style={styles.pokemonImage}
-                      />
-                    </View>
-                  </TouchableOpacity>
+                  <View style={styles.pokemonContainer}>
+                    <Image source={EvolutionBackground} style={styles.backgroundImage} />
+                    <Image
+                      source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${nextStep.id}.png` }}
+                      style={styles.pokemonImage}
+                    />
+                  </View>
                 </View>
                 <View style={styles.nameRow}>
                   <Text style={styles.pokemonName}>{capitalizeFirstLetter(step.name)}</Text>

@@ -114,7 +114,7 @@ const DetailsScreen = () => {
             {() => <StatsSection pokemon={pokemonData} />}
           </Tab.Screen>
           <Tab.Screen name="Evolution">
-            {() => <EvolutionSection pokemon={pokemonData} species={species} navigation={navigation} />}
+            {() => <EvolutionSection pokemon={pokemonData} species={species} />}
           </Tab.Screen>
         </Tab.Navigator>
       </View>
