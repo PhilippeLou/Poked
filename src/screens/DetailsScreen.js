@@ -18,6 +18,7 @@ const DetailsScreen = () => {
   const route = useRoute();
   const { pokemon } = route.params || {}; // Ensure route.params is always defined
 
+  const [pokemonData, setPokemonData] = useState(null);
   const [species, setSpecies] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,17 +26,18 @@ const DetailsScreen = () => {
   useEffect(() => {
     const fetchSpecies = async () => {
       if (!pokemon?.species?.url) {
+        setPokemonData(pokemon); // Use the passed pokemon data directly if no species URL
         setError('Pokémon data is incomplete.');
         setLoading(false);
         return;
       }
 
       try {
+        setPokemonData(pokemon); // Set pokemonData immediately since it's passed
         const response = await fetch(pokemon.species.url);
         if (!response.ok) {
           throw new Error('Failed to fetch species data.');
         }
-
         const data = await response.json();
         setSpecies(data);
       } catch (err) {
@@ -57,7 +59,7 @@ const DetailsScreen = () => {
     );
   }
 
-  if (error || !pokemon) {
+  if (error || !pokemonData) {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>{error || 'No Pokémon data available.'}</Text>
@@ -74,23 +76,23 @@ const DetailsScreen = () => {
         <Ionicons name="arrow-back" size={24} color="black" />
       </TouchableOpacity>
 
-      <Text style={styles.titleMain}>{pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</Text>
-      <Text style={styles.pokeNumber}>{String(pokemon.id).padStart(4, '0')}</Text>
+      <Text style={styles.titleMain}>{pokemonData.name.charAt(0).toUpperCase() + pokemonData.name.slice(1)}</Text>
+      <Text style={styles.pokeNumber}>{String(pokemonData.id).padStart(4, '0')}</Text>
 
       {/* Image Container */}
-      <View style={{ ...styles.imageContainer, backgroundColor: backgroundColors[pokemon.types?.[0]?.type?.name] || 'gray' }}>
+      <View style={{ ...styles.imageContainer, backgroundColor: backgroundColors[pokemonData.types?.[0]?.type?.name] || 'gray' }}>
         <Image source={PatternDetails} style={styles.patternDetails} />
         <Image source={PatternDetails} style={styles.patternDetailsTwo} />
         <Image source={CircleDetails} style={styles.circleDetails} />
 
         <Image
-          source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemon.id}.png` }}
+          source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemonData.id}.png` }}
           style={styles.pokeImage}
           onError={() => console.warn('Failed to load Pokémon image')}
         />
 
         <View style={styles.row}>
-          {pokemon.types?.map((type, index) => (
+          {pokemonData.types?.map((type, index) => (
             <Tag key={index} type={type.type.name} />
           ))}
         </View>
@@ -102,17 +104,17 @@ const DetailsScreen = () => {
           screenOptions={{
             tabBarLabelStyle: { color: textColor.black, fontSize: 14, fontWeight: 'bold' },
             tabBarStyle: { backgroundColor: 'white' },
-            tabBarIndicatorStyle: { backgroundColor: backgroundColors[pokemon.types?.[0]?.type?.name] || 'black' },
+            tabBarIndicatorStyle: { backgroundColor: backgroundColors[pokemonData.types?.[0]?.type?.name] || 'black' },
           }}
         >
           <Tab.Screen name="About">
-            {() => <AboutSection pokemon={pokemon} species={species} />}
+            {() => <AboutSection pokemon={pokemonData} species={species} />}
           </Tab.Screen>
           <Tab.Screen name="Stats">
-            {() => <StatsSection pokemon={pokemon} />}
+            {() => <StatsSection pokemon={pokemonData} />}
           </Tab.Screen>
           <Tab.Screen name="Evolution">
-            {() => <EvolutionSection pokemon={pokemon} species={species} />}
+            {() => <EvolutionSection pokemon={pokemonData} species={species} navigation={navigation} />}
           </Tab.Screen>
         </Tab.Navigator>
       </View>

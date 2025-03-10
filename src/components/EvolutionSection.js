@@ -1,75 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { textColor, backgroundColors } from '../assets/colors';
-import EvolutionBackground from '../assets/Images/evoBG.png'; // Import the background image
+import EvolutionBackground from '../assets/Images/evoBG.png';
 
-const EvolutionSection = ({ pokemon, species }) => {
+const EvolutionSection = ({ pokemon, species, navigation }) => {
   const [evolutionChain, setEvolutionChain] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchEvolutionChain = async () => {
+      if (!species?.evolution_chain?.url) {
+        setLoading(false);
+        return;
+      }
       try {
-        // Get the evolution chain URL from the species data
         const response = await fetch(species.evolution_chain.url);
+        if (!response.ok) throw new Error('Failed to fetch evolution chain.');
         const data = await response.json();
         setEvolutionChain(data.chain);
       } catch (error) {
         console.error('Error fetching evolution chain:', error);
+      } finally {
+        setLoading(false);
       }
     };
+    fetchEvolutionChain();
+  }, [species?.evolution_chain?.url]);
 
-    if (species) {
-      fetchEvolutionChain();
-    }
-  }, [species]);
+  const capitalizeFirstLetter = (str) => (str ? str.charAt(0).toUpperCase() + str.slice(1) : '');
 
-  // Helper function to capitalize the first letter of a string
-  const capitalizeFirstLetter = (str) => {
-    if (!str) return '';
-    return str.charAt(0).toUpperCase() + str.slice(1);
+  const getEvolutionTrigger = (details) => {
+    if (!details?.length) return 'Unknown';
+    const trigger = details[0].trigger.name;
+    if (trigger === 'level-up') return `Lv. ${details[0].min_level || '?'}`;
+    return capitalizeFirstLetter(trigger);
   };
 
-  // Function to extract the evolution level
-  const getEvolutionLevel = (evolutionDetails) => {
-    if (!evolutionDetails || evolutionDetails.length === 0) return '?';
-
-    // Check for level-up evolution
-    const levelUp = evolutionDetails.find(
-      (detail) => detail.trigger.name === 'level-up'
-    );
-
-    if (levelUp) {
-      return levelUp.min_level || '?';
-    }
-
-    // Check for other evolution methods (e.g., stones, trading)
-    const otherMethod = evolutionDetails.find(
-      (detail) => detail.trigger.name !== 'level-up'
-    );
-
-    if (otherMethod) {
-      return `(${capitalizeFirstLetter(otherMethod.trigger.name)})`;
-    }
-
-    return '?';
-  };
-
-  // Function to build the evolution chain in the desired format
   const buildEvolutionChain = (chain) => {
-    if (!chain) return null;
+    if (!chain) return <Text style={styles.noData}>No evolution data available.</Text>;
 
     const evolutionSteps = [];
     let currentChain = chain;
-
-    // Traverse the evolution chain and collect steps
     while (currentChain) {
       evolutionSteps.push({
         name: currentChain.species.name,
-        id: currentChain.species.url.split('/')[6], // Extract Pokémon ID from URL
-        evolutionDetails: currentChain.evolves_to[0]?.evolution_details || [], // Get evolution details
+        id: parseInt(currentChain.species.url.split('/')[6], 10),
+        evolutionDetails: currentChain.evolves_to[0]?.evolution_details || [],
       });
-
-      // Move to the next evolution
       currentChain = currentChain.evolves_to[0];
     }
 
@@ -78,46 +55,37 @@ const EvolutionSection = ({ pokemon, species }) => {
         {evolutionSteps.map((step, index) => {
           if (index < evolutionSteps.length - 1) {
             const nextStep = evolutionSteps[index + 1];
-            const evolutionLevel = getEvolutionLevel(step.evolutionDetails);
-
+            const trigger = getEvolutionTrigger(step.evolutionDetails);
             return (
               <View key={step.id} style={styles.evolutionStep}>
-                {/* First Row: Pokémon Images and Level */}
                 <View style={styles.imageRow}>
-                  {/* First Pokémon */}
-                  <View style={styles.pokemonContainer}>
-                    <Image source={EvolutionBackground} style={styles.backgroundImage} />
-                    <Image
-                      source={{
-                        uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${step.id}.png`,
-                      }}
-                      style={styles.pokemonImage}
-                    />
-                  </View>
-
-                  {/* Evolution Level */}
-                  <Text style={styles.levelText}>(Level {evolutionLevel})</Text>
-
-                  {/* Next Pokémon */}
-                  <View style={styles.pokemonContainer}>
-                    <Image source={EvolutionBackground} style={styles.backgroundImage} />
-                    <Image
-                      source={{
-                        uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${nextStep.id}.png`,
-                      }}
-                      style={styles.pokemonImage}
-                    />
-                  </View>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('Details', { url: `https://pokeapi.co/api/v2/pokemon/${step.id}/` })}
+                  >
+                    <View style={styles.pokemonContainer}>
+                      <Image source={EvolutionBackground} style={styles.backgroundImage} />
+                      <Image
+                        source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${step.id}.png` }}
+                        style={styles.pokemonImage}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                  <Text style={styles.triggerText}>{trigger}</Text>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('Details', { url: `https://pokeapi.co/api/v2/pokemon/${nextStep.id}/` })}
+                  >
+                    <View style={styles.pokemonContainer}>
+                      <Image source={EvolutionBackground} style={styles.backgroundImage} />
+                      <Image
+                        source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${nextStep.id}.png` }}
+                        style={styles.pokemonImage}
+                      />
+                    </View>
+                  </TouchableOpacity>
                 </View>
-
-                {/* Second Row: Pokémon Names */}
                 <View style={styles.nameRow}>
-                  <Text style={styles.pokemonName}>
-                    {capitalizeFirstLetter(step.name)}
-                  </Text>
-                  <Text style={styles.pokemonName}>
-                    {capitalizeFirstLetter(nextStep.name)}
-                  </Text>
+                  <Text style={styles.pokemonName}>{capitalizeFirstLetter(step.name)}</Text>
+                  <Text style={styles.pokemonName}>{capitalizeFirstLetter(nextStep.name)}</Text>
                 </View>
               </View>
             );
@@ -128,17 +96,12 @@ const EvolutionSection = ({ pokemon, species }) => {
     );
   };
 
-  if (!evolutionChain) {
-    return <Text>Loading evolution data...</Text>;
-  }
-
+  if (loading) return <Text style={styles.loading}>Loading evolution data...</Text>;
   return (
-    <ScrollView style={styles.sectionContainer}>
+    <ScrollView style={styles.sectionContainer} contentContainerStyle={styles.contentContainer}>
       <Text style={[styles.heading, { color: backgroundColors[pokemon.types[0].type.name] }]}>
         Evolution Chain
       </Text>
-
-      {/* Render the evolution chain */}
       {buildEvolutionChain(evolutionChain)}
     </ScrollView>
   );
@@ -147,54 +110,18 @@ const EvolutionSection = ({ pokemon, species }) => {
 export default EvolutionSection;
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    flex: 1,
-    padding: 20,
-  },
-  heading: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  evolutionContainer: {
-    flexDirection: 'column',
-  },
-  evolutionStep: {
-    marginBottom: 20,
-  },
-  imageRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  nameRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20, // Adjust spacing to align with images
-  },
-  pokemonContainer: {
-    alignItems: 'center',
-    position: 'relative', // Needed for absolute positioning of the background
-  },
-  backgroundImage: {
-    width: 100, // Adjust based on your image size
-    height: 100, // Adjust based on your image size
-    position: 'absolute', // Position the background behind the Pokémon image
-  },
-  pokemonImage: {
-    width: 80,
-    height: 80,
-    resizeMode: 'contain',
-    zIndex: 1, // Ensure the Pokémon image is above the background
-  },
-  pokemonName: {
-    fontSize: 18,
-    color: textColor.black,
-    marginTop: 5,
-  },
-  levelText: {
-    fontSize: 16,
-    color: textColor.grey,
-  },
+  sectionContainer: { flex: 1, paddingHorizontal: 20 },
+  contentContainer: { paddingVertical: 20 },
+  heading: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+  evolutionContainer: { flexDirection: 'column' },
+  evolutionStep: { marginBottom: 30 },
+  imageRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
+  nameRow: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20 },
+  pokemonContainer: { alignItems: 'center', position: 'relative' },
+  backgroundImage: { width: 100, height: 100, position: 'absolute' },
+  pokemonImage: { width: 80, height: 80, resizeMode: 'contain', zIndex: 1 },
+  pokemonName: { fontSize: 16, color: textColor.black, marginTop: 5, textAlign: 'center' },
+  triggerText: { fontSize: 14, color: textColor.grey, fontStyle: 'italic' },
+  loading: { fontSize: 18, color: textColor.grey, textAlign: 'center', marginTop: 20 },
+  noData: { fontSize: 16, color: textColor.grey, textAlign: 'center' },
 });

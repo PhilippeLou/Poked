@@ -8,7 +8,7 @@ import PokedexImage from '../assets/Images/poketitle.png';
 
 const searchIcon = require('../assets/Icons/Search.png');
 
-const HomeScreen = ({ navigation }) => { // Accept navigation prop
+const HomeScreen = ({ navigation }) => {
   const [pokemonList, setPokemonList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -18,6 +18,7 @@ const HomeScreen = ({ navigation }) => { // Accept navigation prop
       try {
         const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1000');
         const data = await response.json();
+        console.log('API response (first 3):', data.results.slice(0, 3)); // Log to verify data
         setPokemonList(data.results);
       } catch (error) {
         console.error('Error fetching Pokémon list:', error);
@@ -63,7 +64,12 @@ const HomeScreen = ({ navigation }) => { // Accept navigation prop
             data={filteredPokemon}
             keyExtractor={(item) => item.name}
             renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => navigation.navigate('Details', { pokemon: item })}>
+              <TouchableOpacity
+                onPress={() => {
+                  console.log('Navigating with pokemon:', item); // Log to verify item
+                  navigation.navigate('Details', { pokemon: item });
+                }}
+              >
                 <Card item={item.name} />
               </TouchableOpacity>
             )}
@@ -77,7 +83,6 @@ const HomeScreen = ({ navigation }) => { // Accept navigation prop
 };
 
 export default HomeScreen;
-
 
 const styles = StyleSheet.create({
   container: {
@@ -104,16 +109,11 @@ const styles = StyleSheet.create({
   },
   paddedContainer: {
     flex: 1,
-    paddingHorizontal: 20, // Add space on the sides for all content except bgImage
-    marginTop: height / 8 - 40, // Adjust margin to account for bgImage height
+    paddingHorizontal: 20,
+    marginTop: height / 8 - 40,
   },
   contents: {
-    marginTop: 20, // Adjust spacing between bgImage and contents
-  },
-  heading: {
-    fontSize: 45,
-    fontWeight: 'bold',
-    color: textColor.black,
+    marginTop: 20,
   },
   subText: {
     fontSize: 16,
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     height: 60,
     paddingHorizontal: 15,
-    width: '100%', // Ensure the search bar takes full width of its container
+    width: '100%',
   },
   searchIcon: {
     width: 24,
@@ -141,10 +141,9 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: textColor.black,
-    
   },
   listContainer: {
-    paddingBottom: 20, // Ensures proper spacing at the bottom
+    paddingBottom: 20,
   },
   loader: {
     marginTop: 20,

@@ -3,52 +3,51 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { textColor, backgroundColors } from '../assets/colors';
 
 const StatsSection = ({ pokemon }) => {
-  if (!pokemon) {
-    return <Text>Loading...</Text>;
-  }
+  if (!pokemon) return <Text style={styles.loading}>Loading...</Text>;
 
-  // Helper function to capitalize the first letter of a string
-  const capitalizeFirstLetter = (str) => {
-    if (!str) return ''; // Handle empty or undefined strings
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
-
-  // Map stat names to display names
   const statDisplayNames = {
     hp: 'HP',
     attack: 'Attack',
     defense: 'Defense',
-    'special-attack': 'Sp. Attack',
-    'special-defense': 'Sp. Defense',
+    'special-attack': 'Sp. Atk',
+    'special-defense': 'Sp. Def',
     speed: 'Speed',
   };
 
+  const getStatColor = (value) => {
+    if (value > 100) return '#4CAF50'; // Green for high stats
+    if (value > 50) return '#FFC107'; // Yellow for average
+    return '#F44336'; // Red for low
+  };
+
   return (
-    <ScrollView style={styles.sectionContainer}>
+    <ScrollView style={styles.sectionContainer} contentContainerStyle={styles.contentContainer}>
       <Text style={[styles.heading, { color: backgroundColors[pokemon.types[0].type.name] }]}>
         Base Stats
       </Text>
-
-      {/* Stats List */}
-      {pokemon.stats.map((stat, index) => (
-        <View key={index} style={styles.statRow}>
-          <Text style={styles.statName}>
-            {statDisplayNames[stat.stat.name] || capitalizeFirstLetter(stat.stat.name)}
-          </Text>
-          <Text style={styles.statValue}>{stat.base_stat}</Text>
-          <View style={styles.statBarContainer}>
-            <View
-              style={[
-                styles.statBar,
-                {
-                  width: `${(stat.base_stat / 255) * 100}%`, // Normalize stat value to a percentage
-                  backgroundColor: backgroundColors[pokemon.types[0].type.name],
-                },
-              ]}
-            />
+      {pokemon.stats.map((stat) => {
+        const statValue = stat.base_stat;
+        const statPercentage = Math.min((statValue / 255) * 100, 100);
+        return (
+          <View key={stat.stat.name} style={styles.statRow}>
+            <Text style={styles.statName}>
+              {statDisplayNames[stat.stat.name] || stat.stat.name.charAt(0).toUpperCase() + stat.stat.name.slice(1)}
+            </Text>
+            <Text style={styles.statValue}>{statValue}</Text>
+            <View style={styles.statBarContainer}>
+              <View
+                style={[
+                  styles.statBar,
+                  { width: `${statPercentage}%`, backgroundColor: getStatColor(statValue) },
+                ]}
+              />
+            </View>
           </View>
-        </View>
-      ))}
+        );
+      })}
+      <Text style={styles.total}>
+        Total: {pokemon.stats.reduce((sum, stat) => sum + stat.base_stat, 0)}
+      </Text>
     </ScrollView>
   );
 };
@@ -56,41 +55,14 @@ const StatsSection = ({ pokemon }) => {
 export default StatsSection;
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    flex: 1,
-    padding: 20,
-  },
-  heading: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  statRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  statName: {
-    width: 100, 
-    fontSize: 16,
-    color: textColor.black,
-  },
-  statValue: {
-    width: 30,
-    fontSize: 16,
-    color: textColor.black,
-    textAlign: 'right',
-    marginRight: 10,
-  },
-  statBarContainer: {
-    flex: 1,
-    height: 7,
-    backgroundColor: 'transparent',
-    borderRadius: 5,
-    overflow: 'hidden',
-  },
-  statBar: {
-    height: '100%',
-    borderRadius: 5,
-  },
+  sectionContainer: { flex: 1, paddingHorizontal: 20 },
+  contentContainer: { paddingVertical: 20 },
+  heading: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+  statRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  statName: { width: 80, fontSize: 16, color: textColor.black },
+  statValue: { width: 40, fontSize: 16, color: textColor.black, textAlign: 'right', marginRight: 10 },
+  statBarContainer: { flex: 1, height: 10, backgroundColor: '#e0e0e0', borderRadius: 5, overflow: 'hidden' },
+  statBar: { height: '100%', borderRadius: 5 },
+  total: { fontSize: 16, fontWeight: 'bold', color: textColor.grey, marginTop: 10, textAlign: 'right' },
+  loading: { fontSize: 18, color: textColor.grey, textAlign: 'center', marginTop: 20 },
 });
