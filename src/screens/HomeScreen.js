@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ImageBackground, StyleSheet, Text, View, TextInput, Image, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { height, width } from '../assets/constants';
 import Pokeball_header from '../assets/Images/Pokeball-no-bg.png';
@@ -12,16 +12,19 @@ const HomeScreen = ({ navigation }) => {
   const [pokemonList, setPokemonList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchAllPokemon = async () => {
       try {
         const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1000');
+        if (!response.ok) throw new Error('Failed to fetch Pokémon list.');
         const data = await response.json();
-        console.log('API response (first 3):', data.results.slice(0, 3)); // Log to verify data
+        console.log('API response (first 3):', data.results.slice(0, 3));
         setPokemonList(data.results);
       } catch (error) {
         console.error('Error fetching Pokémon list:', error);
+        setError(error.message);
       } finally {
         setLoading(false);
       }
@@ -30,8 +33,27 @@ const HomeScreen = ({ navigation }) => {
     fetchAllPokemon();
   }, []);
 
-  const filteredPokemon = pokemonList.filter((pokemon) =>
-    pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
+  // Memoize filteredPokemon to prevent unnecessary re-renders
+  const filteredPokemon = useCallback(() => {
+    return pokemonList.filter((pokemon) =>
+      pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [pokemonList, searchQuery])();
+
+  // Memoize renderItem to optimize FlatList performance
+  const renderItem = useCallback(
+    ({ item }) => (
+      <TouchableOpacity
+        onPress={() => {
+          console.log('Navigating with pokemon:', item);
+          navigation.navigate('Details', { pokemon: item });
+        }}
+        activeOpacity={0.7} // Slight feedback on press
+      >
+        <Card item={item.name} />
+      </TouchableOpacity>
+    ),
+    [navigation]
   );
 
   return (
@@ -39,42 +61,40 @@ const HomeScreen = ({ navigation }) => {
       <ImageBackground resizeMode="contain" style={styles.bgImage} source={Pokeball_header} />
 
       <View style={styles.paddedContainer}>
-        <View style={styles.contents}>
-          <Image source={PokedexImage} style={styles.pokeTItle} />
+        <View style={styles.header}>
+          <Image source={PokedexImage} style={styles.pokeTitle} />
           <Text style={styles.subText}>
-            Find your favorite Pokémon by name and look for their details.
+            Find your favorite Pokémon by name and explore their details!
           </Text>
 
           <View style={styles.searchContainer}>
             <Image source={searchIcon} style={styles.searchIcon} />
             <TextInput
               style={styles.searchbar}
-              placeholder="Search for a Pokemon..."
+              placeholder="Search for a Pokémon..."
               placeholderTextColor={textColor.grey}
               value={searchQuery}
-              onChangeText={(text) => setSearchQuery(text)}
+              onChangeText={setSearchQuery}
+              autoCapitalize="none" // Prevent auto-capitalization
+              returnKeyType="search" // Better keyboard UX
             />
           </View>
         </View>
 
         {loading ? (
-          <ActivityIndicator size="large" color="#000" style={styles.loader} />
+          <ActivityIndicator size="large" color={customColor.primary} style={styles.loader} />
+        ) : error ? (
+          <Text style={styles.errorText}>{error}</Text>
         ) : (
           <FlatList
             data={filteredPokemon}
             keyExtractor={(item) => item.name}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => {
-                  console.log('Navigating with pokemon:', item); // Log to verify item
-                  navigation.navigate('Details', { pokemon: item });
-                }}
-              >
-                <Card item={item.name} />
-              </TouchableOpacity>
-            )}
+            renderItem={renderItem}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContainer}
+            initialNumToRender={10} // Optimize initial render
+            maxToRenderPerBatch={20} // Batch rendering for performance
+            windowSize={5} // Reduce off-screen rendering
           />
         )}
       </View>
@@ -93,44 +113,43 @@ const styles = StyleSheet.create({
     width: '100%',
     height: height / 4,
     marginTop: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-  },
-  pokeTItle: {
-    width: 300,
-    height: 80,
-    marginVertical: 20,
-    marginTop: -20,
-    marginLeft: 30,
   },
   paddedContainer: {
     flex: 1,
     paddingHorizontal: 20,
     marginTop: height / 8 - 40,
   },
-  contents: {
+  header: {
     marginTop: 20,
+    alignItems: 'center',
+  },
+  pokeTitle: {
+    width: 300,
+    height: 80,
+    marginVertical: 20,
+    marginTop: -20,
   },
   subText: {
     fontSize: 16,
     color: textColor.grey,
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 15,
+    fontStyle: 'italic', // Slight style tweak
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: customColor.input,
-    borderRadius: 10,
-    marginTop: 20,
-    marginBottom: 15,
-    height: 60,
+    borderRadius: 12,
+    marginBottom: 20,
+    height: 50, // Slightly smaller for compactness
     paddingHorizontal: 15,
     width: '100%',
+    elevation: 2, // Subtle shadow for depth
   },
   searchIcon: {
     width: 24,
@@ -146,6 +165,12 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   loader: {
-    marginTop: 20,
+    marginTop: 50,
+  },
+  errorText: {
+    fontSize: 16,
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 50,
   },
 });
