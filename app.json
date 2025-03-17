@@ -20,7 +20,13 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.philippelouis.Poke"
+      "package": "com.philippelouis.Poke",
+      "permissions": ["INTERNET", "ACCESS_NETWORK_STATE"],
+      "config": {
+        "networkSecurityConfig": {
+          "cleartextTrafficPermitted": true
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
