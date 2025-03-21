@@ -1,18 +1,24 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ImageBackground, StyleSheet, Text, View, TextInput, Image, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { ImageBackground, StyleSheet, Text, View, TextInput, Image, FlatList, ActivityIndicator, TouchableOpacity, Modal } from 'react-native';
 import { height, width } from '../assets/constants';
 import Pokeball_header from '../assets/Images/Pokeball-no-bg.png';
 import { customColor, textColor } from '../assets/colors';
 import Card from '../components/Card';
 import PokedexImage from '../assets/Images/poketitle.png';
+import { Ionicons } from '@expo/vector-icons';
 
 const searchIcon = require('../assets/Icons/Search.png');
+const pokeballFallback = require('../assets/Images/Pokeball.png');
 
 const HomeScreen = ({ navigation }) => {
   const [pokemonList, setPokemonList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedPokemon, setSelectedPokemon] = useState(null);
+  const [pokemonDetails, setPokemonDetails] = useState(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
 
   useEffect(() => {
     const fetchAllPokemon = async () => {
@@ -20,46 +26,76 @@ const HomeScreen = ({ navigation }) => {
         const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1000');
         if (!response.ok) throw new Error('Failed to fetch Pokémon list.');
         const data = await response.json();
-        console.log('API response (first 3):', data.results.slice(0, 3));
         setPokemonList(data.results);
       } catch (error) {
-        console.error('Error fetching Pokémon list:', error);
         setError(error.message);
       } finally {
         setLoading(false);
       }
     };
-
     fetchAllPokemon();
   }, []);
 
-  // Memoize filteredPokemon to prevent unnecessary re-renders
+  useEffect(() => {
+    const fetchDetails = async () => {
+      if (!selectedPokemon) return;
+      setDetailsLoading(true);
+      setPokemonDetails(null);
+      try {
+        const response = await fetch(selectedPokemon.url);
+        const data = await response.json();
+        setPokemonDetails(data);
+      } catch (error) {
+        console.error('Error fetching Pokémon details:', error);
+      } finally {
+        setDetailsLoading(false);
+      }
+    };
+    fetchDetails();
+  }, [selectedPokemon]);
+
   const filteredPokemon = useCallback(() => {
     return pokemonList.filter((pokemon) =>
       pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [pokemonList, searchQuery])();
 
-  // Memoize renderItem to optimize FlatList performance
+  // In HomeScreen renderItem
   const renderItem = useCallback(
     ({ item }) => (
       <TouchableOpacity
-        onPress={() => {
-          console.log('Navigating with pokemon:', item);
-          navigation.navigate('Details', { pokemon: item });
-        }}
-        activeOpacity={0.7} // Slight feedback on press
+        onPress={() => navigation.navigate('Details', { pokemon: item })}
+        activeOpacity={0.7}
       >
-        <Card item={item.name} />
+        <Card item={item.name} onPress={() => {
+          setSelectedPokemon(item);
+          setModalVisible(true);
+        }} />
       </TouchableOpacity>
     ),
     [navigation]
   );
 
+  const getPokemonImage = () => {
+    return (
+      pokemonDetails?.sprites?.other?.['official-artwork']?.front_default ||
+      pokemonDetails?.sprites?.front_default ||
+      pokeballFallback
+    );
+  };
+
+  const getTypeColor = () => {
+    const type = pokemonDetails?.types?.[0]?.type?.name;
+    switch(type) {
+      case 'fire': return '#F08030';
+      default: return textColor.grey;
+    }
+  };
+
   return (
     <View style={styles.container}>
       <ImageBackground resizeMode="contain" style={styles.bgImage} source={Pokeball_header} />
-
+      
       <View style={styles.paddedContainer}>
         <View style={styles.header}>
           <Image source={PokedexImage} style={styles.pokeTitle} />
@@ -75,8 +111,8 @@ const HomeScreen = ({ navigation }) => {
               placeholderTextColor={textColor.grey}
               value={searchQuery}
               onChangeText={setSearchQuery}
-              autoCapitalize="none" // Prevent auto-capitalization
-              returnKeyType="search" // Better keyboard UX
+              autoCapitalize="none"
+              returnKeyType="search"
             />
           </View>
         </View>
@@ -92,12 +128,72 @@ const HomeScreen = ({ navigation }) => {
             renderItem={renderItem}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContainer}
-            initialNumToRender={10} // Optimize initial render
-            maxToRenderPerBatch={20} // Batch rendering for performance
-            windowSize={5} // Reduce off-screen rendering
+            initialNumToRender={10}
+            maxToRenderPerBatch={20}
+            windowSize={5}
           />
         )}
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Ionicons name="close" size={28} color={textColor.white} />
+            </TouchableOpacity>
+
+            {detailsLoading || !pokemonDetails ? (
+              <View style={styles.modalLoading}>
+                <ActivityIndicator size="large" color={customColor.primary} />
+                <Text style={styles.modalLoadingText}>Loading...</Text>
+              </View>
+            ) : (
+              <>
+                <View style={[styles.modalHeader, { backgroundColor: getTypeColor() }]}>
+                  <Text style={styles.modalTitle}>
+                    {pokemonDetails.name.charAt(0).toUpperCase() + pokemonDetails.name.slice(1)}
+                  </Text>
+                  <Text style={styles.modalNumber}>
+                    #{String(pokemonDetails.id).padStart(4, '0')}
+                  </Text>
+                  <Image
+                    source={{ uri: getPokemonImage() }}
+                    style={styles.modalImage}
+                  />
+                </View>
+
+                <View style={styles.modalDetails}>
+                  <Text style={styles.detailLabel}>Type:</Text>
+                  <Text style={styles.detailText}>
+                    {pokemonDetails.types.map((t) => t.type.name).join(', ')}
+                  </Text>
+
+                  <Text style={styles.detailLabel}>Height:</Text>
+                  <Text style={styles.detailText}>{pokemonDetails.height / 10} m</Text>
+
+                  <Text style={styles.detailLabel}>Weight:</Text>
+                  <Text style={styles.detailText}>{pokemonDetails.weight / 10} kg</Text>
+
+                  <Text style={styles.detailLabel}>Stats:</Text>
+                  {pokemonDetails.stats.map((stat, index) => (
+                    <Text key={index} style={styles.detailText}>
+                      {stat.stat.name}: {stat.base_stat}
+                    </Text>
+                  ))}
+                </View>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -138,7 +234,7 @@ const styles = StyleSheet.create({
     color: textColor.grey,
     textAlign: 'center',
     marginBottom: 15,
-    fontStyle: 'italic', // Slight style tweak
+    fontStyle: 'italic',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -146,10 +242,10 @@ const styles = StyleSheet.create({
     backgroundColor: customColor.input,
     borderRadius: 12,
     marginBottom: 20,
-    height: 50, // Slightly smaller for compactness
+    height: 50,
     paddingHorizontal: 15,
     width: '100%',
-    elevation: 2, // Subtle shadow for depth
+    elevation: 2,
   },
   searchIcon: {
     width: 24,
@@ -172,5 +268,74 @@ const styles = StyleSheet.create({
     color: 'red',
     textAlign: 'center',
     marginTop: 50,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '90%',
+    height: '80%',
+    backgroundColor: textColor.white,
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 15,
+    right: 15,
+    zIndex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 20,
+    padding: 5,
+  },
+  modalHeader: {
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: textColor.white,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  modalNumber: {
+    fontSize: 16,
+    color: textColor.white,
+    marginBottom: 15,
+  },
+  modalImage: {
+    width: 200,
+    height: 200,
+    resizeMode: 'contain',
+  },
+  modalDetails: {
+    padding: 20,
+    flex: 1,
+  },
+  detailLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: textColor.black,
+    marginTop: 10,
+  },
+  detailText: {
+    fontSize: 16,
+    color: textColor.grey,
+    marginLeft: 10,
+  },
+  modalLoading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalLoadingText: {
+    fontSize: 16,
+    color: textColor.grey,
+    marginTop: 10,
   },
 });
