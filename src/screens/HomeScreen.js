@@ -35,7 +35,7 @@ const HomeScreen = ({ navigation }) => {
   const [pokemonDetails, setPokemonDetails] = useState(null);
   const [speciesDetails, setSpeciesDetails] = useState(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('About'); // Default tab
+  const [activeTab, setActiveTab] = useState('About');
 
   useEffect(() => {
     const fetchAllPokemon = async () => {
@@ -60,13 +60,11 @@ const HomeScreen = ({ navigation }) => {
       setPokemonDetails(null);
       setSpeciesDetails(null);
       try {
-        // Fetch Pokémon details
         const pokemonResponse = await fetch(selectedPokemon.url);
         if (!pokemonResponse.ok) throw new Error('Failed to fetch Pokémon details.');
         const pokemonData = await pokemonResponse.json();
         setPokemonDetails(pokemonData);
 
-        // Fetch species details
         const speciesResponse = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonData.id}`);
         if (!speciesResponse.ok) throw new Error('Failed to fetch species details.');
         const speciesData = await speciesResponse.json();
@@ -97,7 +95,7 @@ const HomeScreen = ({ navigation }) => {
           onPress={() => {
             setSelectedPokemon(item);
             setModalVisible(true);
-            setActiveTab('About'); // Reset to About tab on new selection
+            setActiveTab('About');
           }}
         />
       </TouchableOpacity>
@@ -196,7 +194,12 @@ const HomeScreen = ({ navigation }) => {
               </View>
             ) : (
               <>
-                <View style={[styles.imageContainer, { backgroundColor: getBackgroundColor() }]}>
+                <ImageBackground
+                  source={Pokeball_header}
+                  style={[styles.imageContainer, { backgroundColor: getBackgroundColor() }]}
+                  resizeMode="contain"
+                  imageStyle={styles.imageContainerBackground}
+                >
                   <Text style={styles.modalTitle}>
                     {pokemonDetails.name.charAt(0).toUpperCase() + pokemonDetails.name.slice(1)}
                   </Text>
@@ -204,7 +207,7 @@ const HomeScreen = ({ navigation }) => {
                     #{String(pokemonDetails.id).padStart(4, '0')}
                   </Text>
                   <Image source={{ uri: getPokemonImage() }} style={styles.modalImage} />
-                </View>
+                </ImageBackground>
 
                 <View style={styles.tabContainer}>
                   {tabs.map((tab) => (
@@ -335,6 +338,12 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
+  },
+  imageContainerBackground: {
+    opacity: 0.2, // Subtle Pokéball background
+    width: '100%',
+    height: '100%',
   },
   modalTitle: {
     fontSize: 28,
@@ -344,17 +353,20 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
     textAlign: 'center',
+    zIndex: 1,
   },
   modalNumber: {
     fontSize: 16,
     color: textColor.white,
     marginBottom: 15,
     textAlign: 'center',
+    zIndex: 1,
   },
   modalImage: {
     width: 200,
     height: 200,
     resizeMode: 'contain',
+    zIndex: 1,
   },
   tabContainer: {
     flexDirection: 'row',
